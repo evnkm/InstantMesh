@@ -29,10 +29,13 @@ def random_sample_png(base_path, destination_path):
             selected_png = random.choice(png_files)
             full_path = os.path.join(obj_path, selected_png)
             selected_image_paths.append(full_path)
-    
-    # Copy each selected image to the specified destination directory
-    for image_path in selected_image_paths:
-        shutil.copy(image_path, destination_path)
+
+            # Create a new file name using category and object id
+            new_file_name = f"{category}.{obj}.{selected_png}"
+            destination_file_path = os.path.join(destination_path, new_file_name)
+            
+            # Copy the file with the new name
+            shutil.copy(full_path, destination_file_path)
     
     # Write the source paths to a text file in the destination directory
     source_paths_file = os.path.join(destination_path, 'source_paths.txt')
@@ -43,9 +46,9 @@ def random_sample_png(base_path, destination_path):
     return selected_image_paths
 
 def main():
-    parser = argparse.ArgumentParser(description='Copy sampled images from ShapeNet to a specified directory.')
+    parser = argparse.ArgumentParser(description='Copy sampled images from ShapeNet to a specified directory with new names.')
     parser.add_argument('base_path', type=str, help='The base path to the ShapeNet data directory.')
-    parser.add_argument('destination_path', type=str, help='The destination path where images should be copied.')
+    parser.add_argument('destination_path', type=str, help='The destination path where images should be copied and renamed.')
     
     args = parser.parse_args()
 
@@ -54,7 +57,8 @@ def main():
 
     # Print selected images and their new location
     for image_path in selected_images:
-        print(f"Copied to: {os.path.join(args.destination_path, os.path.basename(image_path))}")
+        new_file_name = os.path.basename(image_path)
+        print(f"Copied and renamed to: {os.path.join(args.destination_path, new_file_name)}")
 
 if __name__ == '__main__':
     main()
