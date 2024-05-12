@@ -1,12 +1,18 @@
 import os
 import random
+import shutil
+import argparse
 
-def random_sample_png(base_path):
+def random_sample_png(base_path, destination_path):
     # List of categories
     categories = [d for d in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, d))]
     
     # List to store full paths of selected images
     selected_image_paths = []
+
+    # Ensure the destination directory exists, create if not
+    if not os.path.exists(destination_path):
+        os.makedirs(destination_path)
 
     # Loop through each category
     for category in categories:
@@ -24,14 +30,31 @@ def random_sample_png(base_path):
             full_path = os.path.join(obj_path, selected_png)
             selected_image_paths.append(full_path)
     
+    # Copy each selected image to the specified destination directory
+    for image_path in selected_image_paths:
+        shutil.copy(image_path, destination_path)
+    
+    # Write the source paths to a text file in the destination directory
+    source_paths_file = os.path.join(destination_path, 'source_paths.txt')
+    with open(source_paths_file, 'w') as f:
+        for path in selected_image_paths:
+            f.write(path + '\n')
+    
     return selected_image_paths
 
-# Base path to the data_tf directory
-base_path = '/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf'
+def main():
+    parser = argparse.ArgumentParser(description='Copy sampled images from ShapeNet to a specified directory.')
+    parser.add_argument('base_path', type=str, help='The base path to the ShapeNet data directory.')
+    parser.add_argument('destination_path', type=str, help='The destination path where images should be copied.')
+    
+    args = parser.parse_args()
 
-# Run the function
-selected_images = random_sample_png(base_path)
+    # Run the function
+    selected_images = random_sample_png(args.base_path, args.destination_path)
 
-# Print selected images
-for image_path in selected_images:
-    print(image_path)
+    # Print selected images and their new location
+    for image_path in selected_images:
+        print(f"Copied to: {os.path.join(args.destination_path, os.path.basename(image_path))}")
+
+if __name__ == '__main__':
+    main()
