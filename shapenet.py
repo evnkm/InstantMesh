@@ -27,7 +27,7 @@ def random_sample_png(base_path):
     return selected_image_paths
 
 # Base path to the data_tf directory
-base_path = 'path/to/shapenet/data_tf'
+base_path = '/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf'
 
 # Run the function
 selected_images = random_sample_png(base_path)
