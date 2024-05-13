@@ -160,7 +160,7 @@ rembg_session = None if args.no_rembg else rembg.new_session()
 
 outputs = []
 for idx, image_file in enumerate(input_files):
-    name = os.path.basename(image_file).split('.')[0]
+    name = os.path.basename(image_file)
     print(f'[{idx+1}/{len(input_files)}] Imagining {name} ...')
 
     # remove background optionally
