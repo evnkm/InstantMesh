@@ -77,10 +77,17 @@ rot_mat_3 = np.array([
     [np.sin(rad_rotation_3), np.cos(rad_rotation_3), 0],
     [0, 0, 1]
 ]).T
+# need to transpose the matrix around x axis to get even better rotation (FOR OBJ FILE)
+rad_rotation_4 = np.deg2rad(15)
+rot_mat_4 = np.array([
+    [1, 0, 0],
+    [0, np.cos(rad_rotation_4), -np.sin(rad_rotation_4)],
+    [0, np.sin(rad_rotation_4), np.cos(rad_rotation_4)]
+]).T
 
 mesh = trimesh.load(OBJ_FILE, process=True)
 mesh_points, _ = trimesh.sample.sample_surface(mesh, 8179)
-mesh_points = mesh_points @ rot_mat_3
+mesh_points = (mesh_points @ rot_mat_3) @ rot_mat_4
 # shift the points to the origin
 mesh_points -= np.mean(mesh_points, axis=0)
 
