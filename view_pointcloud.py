@@ -33,26 +33,30 @@ def inverse_transform(train_data, param):
 
     # Extract transformed positions and normals
     pt_trans = train_data[:, :3]
-    nom_trans = train_data[:, 3:]
 
     # Inverse transformation for positions
     position = np.dot(pt_trans, cam_mat) + cam_pos
 
     # Inverse transformation for normals
-    # normal = np.dot(nom_trans, cam_mat)
-
-    return position #, normal
+    return position
 
 def unit(v):
     norm = np.linalg.norm(v)
     if norm == 0:
         return v
     return v / norm
+
 render_meta = np.loadtxt(RENDERING_METADATA)
 dat_points = np.load(DAT_FILE, allow_pickle=True, encoding='bytes')
 param = render_meta[PHOTO_IDX]
 
-dat_points = inverse_transform(dat_points, param) / SCALING_FACTOR
+dat_points = inverse_transform(dat_points, param)
+rad_rotation = np.deg2rad(-75)
+rot_mat_1 = np.array([[np.cos(rad_rotation), -np.sin(rad_rotation), 0],
+                      [np.sin(rad_rotation), np.cos(rad_rotation), 0],
+                      [0, 0, 1]])
+dat_points = dat_points @ rot_mat_1
+
 # shift the points to the origin
 dat_points -= np.mean(dat_points, axis=0)
 point_cloud_dat = trimesh.points.PointCloud(dat_points, colors=[255, 0, 0])
