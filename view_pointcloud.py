@@ -9,7 +9,7 @@ new_order = [0, 2, 1]
 # new_order = [2, 0, 1]
 # new_order = [2, 1, 0]
 
-dat_points = np.reshape(dat_points, dat_points.shape, order=new_order)
+dat_points = dat_points[:, new_order]
 point_cloud_dat = trimesh.points.PointCloud(dat_points, colors=[255, 0, 0])
 
 mesh = trimesh.load("/om/user/evan_kim/InstantMesh/outputs/instant-mesh-large/meshes/02691156.obj", process=True)
