@@ -53,21 +53,34 @@ param = render_meta[PHOTO_IDX]
 dat_points = inverse_transform(dat_points, param)
 # need to transpose the matrix to get the correct rotation
 rad_rotation_1 = -np.deg2rad(75)
-rot_mat_1 = np.array([[np.cos(rad_rotation_1), -np.sin(rad_rotation_1), 0],
-                      [np.sin(rad_rotation_1), np.cos(rad_rotation_1), 0],
-                      [0, 0, 1]]).T
+rot_mat_1 = np.array([
+    [np.cos(rad_rotation_1), -np.sin(rad_rotation_1), 0],
+    [np.sin(rad_rotation_1), np.cos(rad_rotation_1), 0],
+    [0, 0, 1]
+]).T
 # need to transpose the matrix to get the correct rotation
 rad_rotation_2 = -np.deg2rad(90)
-rot_mat_2 = np.array([[np.cos(rad_rotation_2), 0, -np.sin(rad_rotation_2)],
-                      [0, 1, 0],
-                      [np.sin(rad_rotation_2), 0, np.cos(rad_rotation_2)]]).T
+rot_mat_2 = np.array([
+    [np.cos(rad_rotation_2), 0, -np.sin(rad_rotation_2)],
+    [0, 1, 0],
+    [np.sin(rad_rotation_2), 0, np.cos(rad_rotation_2)]
+]).T
 
 dat_points = ((dat_points @ rot_mat_1) @ rot_mat_2) / SCALING_FACTOR
 # shift the points to the origin
 dat_points -= np.mean(dat_points, axis=0)
 
+# need to transpose the matrix around z axis to get the correct rotation (FOR OBJ FILE)
+rad_rotation_3 = -np.deg2rad(15)
+rot_mat_3 = np.array([
+    [np.cos(rad_rotation_3), -np.sin(rad_rotation_3), 0],
+    [np.sin(rad_rotation_3), np.cos(rad_rotation_3), 0],
+    [0, 0, 1]
+]).T
+
 mesh = trimesh.load(OBJ_FILE, process=True)
 mesh_points, _ = trimesh.sample.sample_surface(mesh, 8179)
+mesh_points = mesh_points @ rot_mat_3
 # shift the points to the origin
 mesh_points -= np.mean(mesh_points, axis=0)
 
