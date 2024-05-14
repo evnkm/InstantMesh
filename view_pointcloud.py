@@ -4,7 +4,7 @@ import trimesh
 PHOTO_IDX = 3
 
 DAT_FILE = f"/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/02691156/98b163efbbdf20c898dc7d57268f30d4/rendering/0{PHOTO_IDX}.dat"
-OBJ_FILE = "/om/user/evan_kim/InstantMesh/outputs/instant-mesh-large/meshes/02691156.obj"
+OBJ_FILE = f"/om/user/evan_kim/InstantMesh/outputs/instant-mesh-large/meshes/02691156.98b163efbbdf20c898dc7d57268f30d4.0{PHOTO_IDX}.png.obj"
 RENDERING_METADATA = "/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/02691156/98b163efbbdf20c898dc7d57268f30d4/rendering/rendering_metadata.txt"
 SCALING_FACTOR = 0.22
 
@@ -64,44 +64,44 @@ rot_mat_2 = np.array([[np.cos(rad_rotation_2), 0, -np.sin(rad_rotation_2)],
 
 dat_points = ((dat_points @ rot_mat_1) @ rot_mat_2) / SCALING_FACTOR
 # shift the points to the origin
-# dat_points -= np.mean(dat_points, axis=0)
+dat_points -= np.mean(dat_points, axis=0)
 
 mesh = trimesh.load(OBJ_FILE, process=True)
 mesh_points, _ = trimesh.sample.sample_surface(mesh, 8179)
 # shift the points to the origin
-# mesh_points -= np.mean(mesh_points, axis=0)
+mesh_points -= np.mean(mesh_points, axis=0)
 
 ##############################################3
 #Take transpose as columns should be the points
-p1 = dat_points.transpose()
-p2 = mesh_points.transpose()
+# p1 = dat_points.transpose()
+# p2 = mesh_points.transpose()
 
-#Calculate centroids
-p1_c = np.mean(p1, axis = 1).reshape((-1,1)) #If you don't put reshape then the outcome is 1D with no rows/colums and is interpeted as rowvector in next minus operation, while it should be a column vector
-p2_c = np.mean(p2, axis = 1).reshape((-1,1))
+# #Calculate centroids
+# p1_c = np.mean(p1, axis = 1).reshape((-1,1)) #If you don't put reshape then the outcome is 1D with no rows/colums and is interpeted as rowvector in next minus operation, while it should be a column vector
+# p2_c = np.mean(p2, axis = 1).reshape((-1,1))
 
-#Subtract centroids
-q1 = p1-p1_c
-q2 = p2-p2_c
+# #Subtract centroids
+# q1 = p1-p1_c
+# q2 = p2-p2_c
 
-#Calculate covariance matrix
-H=np.matmul(q1,q2.transpose())
+# #Calculate covariance matrix
+# H=np.matmul(q1,q2.transpose())
 
-#Calculate singular value decomposition (SVD)
-U, X, V_t = np.linalg.svd(H) #the SVD of linalg gives you Vt
+# #Calculate singular value decomposition (SVD)
+# U, X, V_t = np.linalg.svd(H) #the SVD of linalg gives you Vt
 
-#Calculate rotation matrix
-R = np.matmul(V_t.transpose(),U.transpose())
+# #Calculate rotation matrix
+# R = np.matmul(V_t.transpose(),U.transpose())
 
-assert np.allclose(np.linalg.det(R), 1.0), "Rotation matrix of N-point registration not 1, see paper Arun et al."
+# assert np.allclose(np.linalg.det(R), 1.0), "Rotation matrix of N-point registration not 1, see paper Arun et al."
 
-#Calculate translation matrix
-T = p2_c - np.matmul(R,p1_c)
+# #Calculate translation matrix
+# T = p2_c - np.matmul(R,p1_c)
 
-#Check result
-result = T + np.matmul(R,p1)
+# #Check result
+# result = T + np.matmul(R,p1)
 #########################################
-dat_points = result.transpose()
+# dat_points = result.transpose()
 point_cloud_dat = trimesh.points.PointCloud(dat_points, colors=[255, 0, 0])
 point_cloud_mesh = trimesh.points.PointCloud(mesh_points, colors=[0, 255, 0])
 
