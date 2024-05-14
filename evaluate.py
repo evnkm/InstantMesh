@@ -111,8 +111,24 @@ for obj_filename in input_files:
     # shift the points to the origin
     dat_points -= np.mean(dat_points, axis=0)
 
+    # need to transpose the matrix around z axis to get the correct rotation (FOR OBJ FILE)
+    rad_rotation_3 = -np.deg2rad(15)
+    rot_mat_3 = np.array([
+        [np.cos(rad_rotation_3), -np.sin(rad_rotation_3), 0],
+        [np.sin(rad_rotation_3), np.cos(rad_rotation_3), 0],
+        [0, 0, 1]
+    ]).T
+    # need to transpose the matrix around x axis to get even better rotation (FOR OBJ FILE)
+    rad_rotation_4 = np.deg2rad(15)
+    rot_mat_4 = np.array([
+        [1, 0, 0],
+        [0, np.cos(rad_rotation_4), -np.sin(rad_rotation_4)],
+        [0, np.sin(rad_rotation_4), np.cos(rad_rotation_4)]
+    ]).T
+
     mesh = trimesh.load(obj_filename, process=True)
     mesh_points, _ = trimesh.sample.sample_surface(mesh, min(mesh.vertices.shape[0], dat_points.shape[0]))
+    mesh_points = (mesh_points @ rot_mat_3) @ rot_mat_4
     # shift the points to the origin
     mesh_points -= np.mean(mesh_points, axis=0)
 
