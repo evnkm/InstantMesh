@@ -80,6 +80,8 @@ input_files = [
     if file.endswith('.obj')
 ]
 
+results = {}
+
 for obj_filename in input_files:
     png_name, ext = os.path.splitext(os.path.basename(obj_filename))
     path_loc = os.path.splitext(png_name)[0]
@@ -87,7 +89,6 @@ for obj_filename in input_files:
     print("category:", category, "id:", id, "png_idx:", png_idx)
     dat_filename = f'/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/{category}/{id}/rendering/{png_idx}.dat'
     rendering_metadata = f'/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/{category}/{id}/rendering/rendering_metadata.txt'
-
 
     render_meta = np.loadtxt(rendering_metadata)
     dat_points = np.load(dat_filename, allow_pickle=True, encoding='bytes')
@@ -125,3 +126,13 @@ for obj_filename in input_files:
 
     print("Chamfer Distance:", cd)
     print("F-Score:", fs)
+
+    results[obj_filename] = {"CD": cd, "FS": fs}
+
+
+import json
+with open("evaluation_results.json", "w") as file:
+    # Convert the dictionary to a JSON string
+    json_string = json.dumps(results)
+    # Write the JSON string to the file
+    file.write(json_string)
