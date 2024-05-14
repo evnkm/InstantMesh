@@ -127,11 +127,19 @@ for obj_filename in input_files:
     print("Chamfer Distance:", cd)
     print("F-Score:", fs)
 
-    results[obj_filename] = {"CD": cd, "FS": fs}
+    if category not in results:
+        results[category] = {"CD": [], "FS": []}
+    results[category]["CD"].append((id, png_idx, cd))
+    results[category]["FS"].append((id, png_idx, fs))
+
+
+print("RESULTS:\n", results)
+print("AVERAGE CD PER CATEGORY:\n", {category: np.mean([cd for _, _, cd in results[category]["CD"]]) for category in results})
+print("AVERAGE FS PER CATEGORY:\n", {category: np.mean([fs for _, _, fs in results[category]["FS"]]) for category in results})
 
 
 import json
-with open("evaluation_results.json", "w") as file:
+with open("eval_results.json", "w") as file:
     # Convert the dictionary to a JSON string
     json_string = json.dumps(results)
     # Write the JSON string to the file
