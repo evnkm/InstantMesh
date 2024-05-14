@@ -81,7 +81,7 @@ input_files = [
 ]
 
 for obj_filename in input_files:
-    png_name, ext = os.path.splitext(obj_filename)
+    png_name, ext = os.path.splitext(os.path.basename(obj_filename))
     path_loc = os.path.splitext(png_name)[0]
     category, id, png_idx = tuple(path_loc.split('.'))
     print("category:", category, "id:", id, "png_idx:", png_idx)
