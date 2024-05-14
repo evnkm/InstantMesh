@@ -3,6 +3,7 @@ import trimesh
 from scipy.spatial import cKDTree
 
 POINTS_TO_SAMPLE = None
+P2M_SCALING_FACTOR = 0.57
 
 def load_and_sample_mesh(filename):
     # Load mesh from a .obj file
@@ -12,7 +13,7 @@ def load_and_sample_mesh(filename):
 
 def load_and_prepare_dat(filename):
     # Load .dat file (pickled numpy array, bytes encoding)
-    points = np.load(filename, allow_pickle=True, encoding='bytes')
+    points = np.load(filename, allow_pickle=True, encoding='bytes') / P2M_SCALING_FACTOR
     POINTS_TO_SAMPLE = points.shape[0]
     return points[:, :3]
 
