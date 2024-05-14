@@ -2,29 +2,46 @@ import numpy as np
 import trimesh
 from scipy.spatial import cKDTree
 
+import os
+import argparse
+from PIL import Image
+
 POINTS_TO_SAMPLE = None
-P2M_SCALING_FACTOR = 0.57
+P2M_SCALING_FACTOR = 0.22
 
-def load_and_sample_mesh(filename):
-    # Load mesh from a .obj file
-    mesh = trimesh.load(filename, process=True)
-    points, _ = trimesh.sample.sample_surface(mesh, POINTS_TO_SAMPLE)
-    print("SAMPLED OBJ POINTS SHAPE:", points.shape)
-    print("SAMPLED OBJ POINTS:", points)
-    return points
+#########################################################
+def unit(v):
+    norm = np.linalg.norm(v)
+    if norm == 0:
+        return v
+    return v / norm
 
-def load_and_prepare_dat(filename):
-    # Load .dat file (pickled numpy array, bytes encoding)
-    points = np.load(filename, allow_pickle=True, encoding='bytes')[:, :3] / P2M_SCALING_FACTOR
-    POINTS_TO_SAMPLE = points.shape[0]
-    print("DAT PC POINTS SHAPE:", points.shape)
-    print("DAT PC POINTS:", points)
-    return points
+def inverse_transform(train_data, param):
+    # Unpack camera parameters
+    theta = np.deg2rad(param[0])
+    phi = np.deg2rad(param[1])
+    camY = param[3] * np.sin(phi)
+    temp = param[3] * np.cos(phi)
+    camX = temp * np.cos(theta)
+    camZ = temp * np.sin(theta)
+    cam_pos = np.array([camX, camY, camZ])
 
-def load_dat_and_obj(dat_filename, obj_filename):
-    ground_truth_points = load_and_prepare_dat(dat_filename)
-    generated_points = load_and_sample_mesh(obj_filename)
-    return ground_truth_points, generated_points
+    # Compute camera matrix
+    axisZ = cam_pos.copy()
+    axisY = np.array([0, 1, 0])
+    axisX = np.cross(axisY, axisZ)
+    axisY = np.cross(axisZ, axisX)
+    cam_mat = np.array([unit(axisX), unit(axisY), unit(axisZ)])
+
+    # Extract transformed positions and normals
+    pt_trans = train_data[:, :3]
+
+    # Inverse transformation for positions
+    position = np.dot(pt_trans, cam_mat) + cam_pos
+
+    # Inverse transformation for normals
+    return position
+#########################################################
 
 def normalize_points(points):
     # Normalize points into the cube [-1, 1]^3
@@ -51,21 +68,60 @@ def f_score(p1, p2, threshold=1e-4):
     fs = 2 * precision * recall / (precision + recall)
     return fs
 
-# Paths to your files
-# using example plane obj for proof of concept
-obj_filename = '/om/user/evan_kim/InstantMesh/outputs/instant-mesh-large/meshes/02691156.obj'
-dat_filename = '/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/02691156/98b163efbbdf20c898dc7d57268f30d4/rendering/03.dat'
+parser = argparse.ArgumentParser()
+parser.add_argument('input_path', type=str, help='Path to input .obj directory.')
+# parser.add_argument('--output_path', type=str, default='outputs/', help='Output directory.')
+args = parser.parse_args()
 
-# Load and sample meshes
-ground_truth_points, generated_points = load_dat_and_obj(dat_filename, obj_filename)
 
-# Normalize points
-generated_points = normalize_points(generated_points)
-ground_truth_points = normalize_points(ground_truth_points)
+input_files = [
+    os.path.join(args.input_path, file)
+    for file in os.listdir(args.input_path) 
+    if file.endswith('.obj')
+]
 
-# Compute metrics
-cd = chamfer_distance(generated_points, ground_truth_points)
-fs = f_score(generated_points, ground_truth_points)
+for obj_filename in input_files:
+    png_name, ext = os.path.splitext(obj_filename)
+    path_loc = os.path.splitext(png_name)[0]
+    category, id, png_idx = tuple(path_loc.split('.'))
+    print("category:", category, "id:", id, "png_idx:", png_idx)
+    dat_filename = f'/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/{category}/{id}/rendering/{png_idx}.dat'
+    rendering_metadata = f'/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/{category}/{id}/rendering/rendering_metadata.txt'
 
-print("Chamfer Distance:", cd)
-print("F-Score:", fs)
+
+    render_meta = np.loadtxt(rendering_metadata)
+    dat_points = np.load(dat_filename, allow_pickle=True, encoding='bytes')
+    param = render_meta[png_idx]
+
+    # Load and sample meshes
+    dat_points = inverse_transform(dat_points, param)
+    # need to transpose the matrix to get the correct rotation
+    rad_rotation_1 = -np.deg2rad(75)
+    rot_mat_1 = np.array([[np.cos(rad_rotation_1), -np.sin(rad_rotation_1), 0],
+                        [np.sin(rad_rotation_1), np.cos(rad_rotation_1), 0],
+                        [0, 0, 1]]).T
+    # need to transpose the matrix to get the correct rotation
+    rad_rotation_2 = -np.deg2rad(90)
+    rot_mat_2 = np.array([[np.cos(rad_rotation_2), 0, -np.sin(rad_rotation_2)],
+                        [0, 1, 0],
+                        [np.sin(rad_rotation_2), 0, np.cos(rad_rotation_2)]]).T
+
+    dat_points = ((dat_points @ rot_mat_1) @ rot_mat_2) / P2M_SCALING_FACTOR
+    # shift the points to the origin
+    dat_points -= np.mean(dat_points, axis=0)
+
+    mesh = trimesh.load(obj_filename, process=True)
+    mesh_points, _ = trimesh.sample.sample_surface(mesh, min(mesh.vertices.shape[0], dat_points.shape[0]))
+    # shift the points to the origin
+    mesh_points -= np.mean(mesh_points, axis=0)
+
+    # Normalize points
+    mesh_points = normalize_points(mesh_points)
+    dat_points = normalize_points(dat_points)
+
+    # Compute metrics
+    cd = chamfer_distance(mesh_points, dat_points)
+    fs = f_score(mesh_points, dat_points)
+
+    print("Chamfer Distance:", cd)
+    print("F-Score:", fs)

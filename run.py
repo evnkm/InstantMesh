@@ -160,7 +160,7 @@ rembg_session = None if args.no_rembg else rembg.new_session()
 
 outputs = []
 for idx, image_file in enumerate(input_files):
-    name = os.path.basename(image_file)
+    name, _ = os.path.splitext(os.path.basename(image_file))
     print(f'[{idx+1}/{len(input_files)}] Imagining {name} ...')
 
     # remove background optionally
@@ -195,7 +195,7 @@ input_cameras = get_zero123plus_input_cameras(batch_size=1, radius=4.0*args.scal
 chunk_size = 20 if IS_FLEXICUBES else 1
 
 for idx, sample in enumerate(outputs):
-    name = sample['name']
+    name, _ = os.path.splitext(sample['name'])
     print(f'[{idx+1}/{len(outputs)}] Creating {name} ...')
 
     images = sample['images'].unsqueeze(0).to(device)
