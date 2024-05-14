@@ -8,12 +8,8 @@ mesh = trimesh.load("/om/user/evan_kim/InstantMesh/outputs/instant-mesh-large/me
 mesh_points, _ = trimesh.sample.sample_surface(mesh, 8179)
 point_cloud_mesh = trimesh.points.PointCloud(mesh_points)
 
-
-pc1 = trimesh.points.PointCloud(point_cloud_dat, colors=[1.0, 0.0, 0.0])
-pc2 = trimesh.points.PointCloud(point_cloud_mesh, colors=[0.0, 1.0, 0.0])
-
 # Visualize the point clouds
 scene = trimesh.Scene()
-scene.add_geometry(pc1)
-scene.add_geometry(pc2)
+scene.add_geometry(point_cloud_dat)
+scene.add_geometry(point_cloud_mesh)
 scene.show()
