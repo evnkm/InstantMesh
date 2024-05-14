@@ -9,13 +9,17 @@ def load_and_sample_mesh(filename):
     # Load mesh from a .obj file
     mesh = trimesh.load(filename, process=True)
     points, _ = trimesh.sample.sample_surface(mesh, POINTS_TO_SAMPLE)
+    print("SAMPLED OBJ POINTS SHAPE:", points.shape)
+    print("SAMPLED OBJ POINTS:", points)
     return points
 
 def load_and_prepare_dat(filename):
     # Load .dat file (pickled numpy array, bytes encoding)
-    points = np.load(filename, allow_pickle=True, encoding='bytes') / P2M_SCALING_FACTOR
+    points = np.load(filename, allow_pickle=True, encoding='bytes')[:, :3] / P2M_SCALING_FACTOR
     POINTS_TO_SAMPLE = points.shape[0]
-    return points[:, :3]
+    print("DAT PC POINTS SHAPE:", points.shape)
+    print("DAT PC POINTS:", points)
+    return points
 
 def load_dat_and_obj(dat_filename, obj_filename):
     ground_truth_points = load_and_prepare_dat(dat_filename)
