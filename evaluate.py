@@ -58,7 +58,7 @@ def chamfer_distance(p1, p2):
     cd = np.mean(closest_p2_to_p1) + np.mean(closest_p1_to_p2)
     return cd / 2
 
-def f_score(p1, p2, threshold=1e-4):
+def f_score(p1, p2, threshold=0.2):
     tree1 = cKDTree(p1)
     tree2 = cKDTree(p2)
     recall = np.mean(tree1.query(p2)[0] < threshold)
