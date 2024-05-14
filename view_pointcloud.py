@@ -55,7 +55,7 @@ rad_rotation = np.deg2rad(-75)
 rot_mat_1 = np.array([[np.cos(rad_rotation), -np.sin(rad_rotation), 0],
                       [np.sin(rad_rotation), np.cos(rad_rotation), 0],
                       [0, 0, 1]])
-dat_points = dat_points @ rot_mat_1
+dat_points = (dat_points @ rot_mat_1) / SCALING_FACTOR
 
 # shift the points to the origin
 dat_points -= np.mean(dat_points, axis=0)
