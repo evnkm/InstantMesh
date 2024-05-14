@@ -6,7 +6,7 @@ PHOTO_IDX = 3
 DAT_FILE = f"/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/02691156/98b163efbbdf20c898dc7d57268f30d4/rendering/0{PHOTO_IDX}.dat"
 OBJ_FILE = f"/om/user/evan_kim/InstantMesh/outputs/instant-mesh-large/meshes/02691156.98b163efbbdf20c898dc7d57268f30d4.0{PHOTO_IDX}.png.obj"
 RENDERING_METADATA = "/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/02691156/98b163efbbdf20c898dc7d57268f30d4/rendering/rendering_metadata.txt"
-SCALING_FACTOR = 0.22
+SCALING_FACTOR = 0.20
 
 # new_order = [0, 2, 1]
 # new_order = [1, 0, 2]
