@@ -51,11 +51,18 @@ dat_points = np.load(DAT_FILE, allow_pickle=True, encoding='bytes')
 param = render_meta[PHOTO_IDX]
 
 dat_points = inverse_transform(dat_points, param)
-rad_rotation = np.deg2rad(-75)
-rot_mat_1 = np.array([[np.cos(rad_rotation), -np.sin(rad_rotation), 0],
-                      [np.sin(rad_rotation), np.cos(rad_rotation), 0],
-                      [0, 0, 1]])
-dat_points = (dat_points @ rot_mat_1) / SCALING_FACTOR
+# need to transpose the matrix to get the correct rotation
+rad_rotation_1 = -np.deg2rad(75)
+rot_mat_1 = np.array([[np.cos(rad_rotation_1), -np.sin(rad_rotation_1), 0],
+                      [np.sin(rad_rotation_1), np.cos(rad_rotation_1), 0],
+                      [0, 0, 1]]).T
+# need to transpose the matrix to get the correct rotation
+rad_rotation_2 = np.deg2rad(90)
+rot_mat_2 = np.array([[np.cos(rad_rotation_2), 0, -np.sin(rad_rotation_2)],
+                      [0, 1, 0],
+                      [np.sin(rad_rotation_2), 0, np.cos(rad_rotation_2)]]).T
+
+dat_points = ((dat_points @ rot_mat_1) @ rot_mat_2) / SCALING_FACTOR
 
 # shift the points to the origin
 dat_points -= np.mean(dat_points, axis=0)
