@@ -15,9 +15,9 @@ mesh = trimesh.load("/om/user/evan_kim/InstantMesh/outputs/instant-mesh-large/me
 mesh_points, _ = trimesh.sample.sample_surface(mesh, 8179)
 point_cloud_mesh = trimesh.points.PointCloud(mesh_points, colors=[0, 255, 0])
 
-result = trimesh.registration.icp(point_cloud_dat, point_cloud_mesh)
+result = trimesh.registration.icp(dat_points, point_cloud_mesh)
 # Apply the transformation to align point_cloud_2
-point_cloud_mesh.apply_transform(result.transformation)
+point_cloud_dat.apply_transform(result.transformation)
 
 # Visualize the point clouds
 scene = trimesh.Scene()
