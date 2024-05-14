@@ -97,13 +97,11 @@ assert np.allclose(np.linalg.det(R), 1.0), "Rotation matrix of N-point registrat
 
 #Calculate translation matrix
 T = p2_c - np.matmul(R,p1_c)
-print("SHAPE OF T: ", T.shape)
 
 #Check result
 result = T + np.matmul(R,p1)
-print("SHAPE OF RESULT: ", result.shape)
 #########################################
-
+dat_points = result.transpose()
 point_cloud_dat = trimesh.points.PointCloud(dat_points, colors=[255, 0, 0])
 point_cloud_mesh = trimesh.points.PointCloud(mesh_points, colors=[0, 255, 0])
 
