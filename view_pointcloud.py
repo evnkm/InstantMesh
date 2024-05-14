@@ -6,7 +6,7 @@ PHOTO_IDX = 3
 DAT_FILE = f"/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/02691156/98b163efbbdf20c898dc7d57268f30d4/rendering/0{PHOTO_IDX}.dat"
 OBJ_FILE = "/om/user/evan_kim/InstantMesh/outputs/instant-mesh-large/meshes/02691156.obj"
 RENDERING_METADATA = "/om/user/evan_kim/SculptFormer/datasets/data/shapenet/data_tf/02691156/98b163efbbdf20c898dc7d57268f30d4/rendering/rendering_metadata.txt"
-SCALING_FACTOR = 0.19
+SCALING_FACTOR = 0.24
 
 # new_order = [0, 2, 1]
 # new_order = [1, 0, 2]
@@ -57,7 +57,7 @@ rot_mat_1 = np.array([[np.cos(rad_rotation_1), -np.sin(rad_rotation_1), 0],
                       [np.sin(rad_rotation_1), np.cos(rad_rotation_1), 0],
                       [0, 0, 1]]).T
 # need to transpose the matrix to get the correct rotation
-rad_rotation_2 = np.deg2rad(90)
+rad_rotation_2 = -np.deg2rad(90)
 rot_mat_2 = np.array([[np.cos(rad_rotation_2), 0, -np.sin(rad_rotation_2)],
                       [0, 1, 0],
                       [np.sin(rad_rotation_2), 0, np.cos(rad_rotation_2)]]).T
