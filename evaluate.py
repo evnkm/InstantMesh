@@ -91,7 +91,7 @@ for obj_filename in input_files:
 
     render_meta = np.loadtxt(rendering_metadata)
     dat_points = np.load(dat_filename, allow_pickle=True, encoding='bytes')
-    param = render_meta[png_idx]
+    param = render_meta[int(png_idx)]
 
     # Load and sample meshes
     dat_points = inverse_transform(dat_points, param)
