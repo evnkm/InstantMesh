@@ -14,7 +14,7 @@ def load_and_prepare_dat(filename):
     # Load .dat file (pickled numpy array, bytes encoding)
     points = np.load(filename, allow_pickle=True, encoding='bytes')
     POINTS_TO_SAMPLE = points.shape[0]
-    return points
+    return points[:, :3]
 
 def load_dat_and_obj(dat_filename, obj_filename):
     ground_truth_points = load_and_prepare_dat(dat_filename)
